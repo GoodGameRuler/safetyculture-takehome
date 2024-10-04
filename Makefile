@@ -1,5 +1,7 @@
 TARGET := folders
 BINDIR := bin
+SRCDIR := folder
+MAINFILE := main.go
 
 .PHONY: all build build_run test clean unit_tests e2e_tests
 
@@ -20,9 +22,9 @@ unit_tests:
 e2e_tests: $(BINDIR)/$(TARGET)
 	@echo E2E Tests in progress
 
-$(BINDIR)/$(TARGET):
+$(BINDIR)/$(TARGET): $(MAINFILE) $(wildcard $(SRCDIR)/**/*.go)
 	@mkdir -p $(BINDIR)
-	@go build -o $(BINDIR)/$(TARGET)
+	go build -o $(BINDIR)/$(TARGET)
 
 clean:
 	@rm -rf bin
