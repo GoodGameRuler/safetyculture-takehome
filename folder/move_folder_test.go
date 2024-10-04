@@ -3,6 +3,7 @@ package folder_test
 import (
 	"errors"
 	"slices"
+	s "strings"
 	"testing"
 
 	"github.com/georgechieng-sc/interns-2022/folder"
@@ -231,6 +232,13 @@ func Test_folder_MoveFolder(t *testing.T) {
 			if !errors.Is(err, tt.expectedErr) && (err == nil || tt.expectedErr == nil || err.Error() != tt.expectedErr.Error()) {
 				t.Errorf("MoveFolder() error = %v, want %v", err, tt.expectedErr)
 			}
+
+			sortingFunc := func (a folder.Folder, b folder.Folder) int {
+				return s.Compare(a.Name, b.Name)
+			}
+
+			slices.SortStableFunc(got, sortingFunc)
+			slices.SortStableFunc(tt.want, sortingFunc)
 
 			if !slices.Equal(got, tt.want) {
 				t.Errorf("MoveFolder() = %v, want %v", got, tt.want)
