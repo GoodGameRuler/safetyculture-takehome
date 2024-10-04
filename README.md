@@ -68,7 +68,7 @@ Please see `udit-tree-sol`
 
 ### The O(1) Solution
 
-The hint I got from this was maps. Obviously maps provide an amortised time-complexity, but they are simple and elegant as compared to a string prefix match. So This time around I encode the tree structure in the slice itself by ordering by the path. I then use an auxiliary data-structure, to map folderName to the index and (subtree) size of each node. Following, the get operations simply return a subarray. Which is a constant timer operation as a slice is represented by a ptr, a length, and a capacity ((Slice Expression)[https://go.dev/ref/spec#Slice_expressions]).
+The hint I got from this was maps. Obviously maps provide an amortised time-complexity, but they are simple and elegant as compared to a string prefix match. So This time around I encode the tree structure in the slice itself by ordering by the path. I then use an auxiliary data-structure, to map folderName to the index and (subtree) size of each node. Following, the get operations simply return a subarray. Which is a constant timer operation as a slice is represented by a ptr, a length, and a capacity ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)).
 
 Please see `main`
 
@@ -78,6 +78,11 @@ Testing was a large part of developing this solution. I planned to test alongsid
 ## My Experience
 Following learning Zig, Go seemed quite like a distant sibling. The experience was quite enjoyable. I enjoy Go's simple and easy to use declarative structure.
 
-I am very grateful to have a reason to learn go. Although, I did face the following issues
+I am grateful to have a reason to learn go. I would love to follow through and spend some more time learning Go. Particularly I would love to learn about using go to do following
+- Creating an HTTP Server
+- Using Channels
+- Processes and Systems Development
+
+Although, I did face the following issues
 - I had some trouble navigating documentation. I found the Go by Example guide a much quicker way to navigate Go than the documentation at first.
--
+- Testing in Go was quite different to any other library I have used, and did take some time to get accustomed to.
