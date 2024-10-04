@@ -228,11 +228,11 @@ func Test_folder_MoveFolder(t *testing.T) {
 			f := folder.NewDriver(tt.folders)
 			got, err := f.MoveFolder(tt.src, tt.dst)
 
-			// Compare the error messages
 			if !errors.Is(err, tt.expectedErr) && (err == nil || tt.expectedErr == nil || err.Error() != tt.expectedErr.Error()) {
 				t.Errorf("MoveFolder() error = %v, want %v", err, tt.expectedErr)
 			}
 
+			// Testing that slices are equal independent of order
 			sortingFunc := func (a folder.Folder, b folder.Folder) int {
 				return s.Compare(a.Name, b.Name)
 			}

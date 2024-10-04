@@ -7,6 +7,9 @@ import (
 	"slices"
 )
 
+
+// The same move folder function from the initial solution as state does not persist
+// O(n^1)
 func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	folders := make([]Folder, len(f.folders))
 	copy(folders, f.folders)
@@ -18,6 +21,7 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	var destFolder *Folder = nil
 	var srcFolder *Folder = nil
 
+	// Find our source and destination folders
 	for i := range folders {
 		switch folders[i].Name {
 		case name:
@@ -49,6 +53,7 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	srcParts := s.Split(srcFolder.Paths, ".")
 	dstParts := s.Split(destFolder.Paths, ".")
 
+	// Find the longest common path
 	commonLength := 0
 	for i := 0; i < min(len(srcParts), len(dstParts)); i++ {
 		if srcParts[i] == dstParts[i] {
@@ -59,35 +64,51 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	}
 
 	newBasePath := destFolder.Paths
-	if commonLength < len(srcParts) {
-		newBasePath += "." + s.Join(srcParts[commonLength:], ".")
+	srcPath := srcFolder.Paths
+
+	// Prevent undefined behaviour but does open program to DOS Attacks if event
+	// Never should be case - suggests that src is child or is dest but handled above
+	if commonLength >= len(srcParts) {
+		panic("Common length should never be greater than or equal to ")
 	}
 
+	newBasePath += "." + s.Join(srcParts[commonLength:], ".")
+
+	// Update path
 	for i, folder := range folders {
 		if folder.Name == srcFolder.Name {
 			folders[i].Paths = newBasePath
-		} else if s.HasPrefix(folder.Paths, srcFolder.Paths+".") {
-			folders[i].Paths = s.Replace(folder.Paths, srcFolder.Paths+".", newBasePath+".", 1)
+		} else if s.HasPrefix(folder.Paths, srcPath+".") {
+			folders[i].Paths = s.Replace(folder.Paths, srcPath+".", newBasePath+".", 1)
 		}
 	}
 
-	slices.SortStableFunc(folders, func(f1, f2 Folder) int {
-		return s.Compare(f1.Paths, f2.Paths)
-	})
+	slices.SortStableFunc(folders, pathOrderComparator)
 
-	// Commented-out code for updating maps (size, index, orgMap) if persistent state is used.
+	// Commented-out logic for updating maps (size, index, orgMap) for the cae state is persistant
+	// Essentially recreating the loop as in newDriver
 	/*
-		// Update folderMap with new index and size values
-		f.folderMap[srcFolder.Name] = folderInfo{
-			index: <new_index>,
-			size:  <new_size>,
+		// Initialize a new folderMap and orgMap
+		newFolderMap := make(map[string]folderInfo)
+		newOrgMap := make(map[uuid.UUID][]Folder)
+
+		// Loop through all folders to populate the new maps
+		for index, folder := range folders {
+			// Update the folderMap with the new index and size values
+			newFolderMap[folder.Name] = folderInfo{
+				index: index,
+				size:  calculateSize(folder), // Function to calculate size of the folder
+			}
+
+			// Update the orgMap to reflect the changes
+			newOrgMap[folder.OrgId] = append(newOrgMap[folder.OrgId], folder)
 		}
 
-		// Update orgMap to reflect changes
-		f.orgMap[srcFolder.OrgId] = append(f.orgMap[srcFolder.OrgId], srcFolder)
+		// Assign the new maps to the driver's folderMap and orgMap
+		f.folderMap = newFolderMap
+		f.orgMap = newOrgMap
 	*/
 
-	// Return the modified folders slice
 	return folders, nil
 }
 
