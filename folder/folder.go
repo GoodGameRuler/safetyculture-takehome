@@ -1,6 +1,10 @@
 package folder
 
-import "github.com/gofrs/uuid"
+import (
+	s "strings"
+
+	"github.com/gofrs/uuid"
+)
 
 type IDriver interface {
 	// GetFoldersByOrgID returns all folders that belong to a specific orgID.
@@ -17,17 +21,60 @@ type IDriver interface {
 }
 
 type driver struct {
-	// define attributes here
-	// data structure to store folders
-	// or preprocessed data
+	folders     []Folder
+	folderMap   map[string]*FolderNode
+	rootFolders []*FolderNode
+}
 
-	// example: feel free to change the data structure, if slice is not what you want
-	folders []Folder
+type FolderNode struct {
+	Folder   Folder
+	Parent   *FolderNode
+	Children []*FolderNode
+}
+
+func (d *driver) buildFolderTree() {
+	for _, folder := range d.folders {
+		parts := s.Split(folder.Paths, ".")
+		currentNode := d.getOrCreateNode(parts, folder)
+
+		d.folderMap[folder.Name] = currentNode
+
+		// Add to root folders if number of parts is 1
+		if len(parts) == 1 {
+			d.rootFolders = append(d.rootFolders, currentNode)
+		}
+	}
+}
+
+func (d *driver) getOrCreateNode(parts []string, folder Folder) *FolderNode {
+	var currentNode *FolderNode
+
+	for _, part := range parts {
+		if node, exists := d.folderMap[part]; exists {
+			currentNode = node
+		} else {
+			newNode := &FolderNode{Folder: folder}
+
+			if currentNode != nil {
+				newNode.Parent = currentNode
+				currentNode.Children = append(currentNode.Children, newNode)
+			}
+			currentNode = newNode
+
+
+			d.folderMap[part] = newNode
+		}
+	}
+
+	return currentNode
 }
 
 func NewDriver(folders []Folder) IDriver {
-	return &driver{
-		// initialize attributes here
-		folders: folders,
+	d := &driver{
+		folders:   folders,
+		folderMap: make(map[string]*FolderNode),
 	}
+
+	d.buildFolderTree()
+	return d
 }
