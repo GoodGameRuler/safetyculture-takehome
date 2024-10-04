@@ -17,9 +17,9 @@ MoveFolders: O(n^2)
 **Space Complexity**
 O(n) across
 
-Perhaps there is a solution the also optimises for pre-processing. I make the argument that the use case this taks this would apply to for a client, would be in receiving data using the get services more often than using move service. I also argue that in a real-time system we are not pre-processing data often. Hence, for this task I take this perhaps _opinionated_ optimisation for the getter operations.
+I argue that the main way a client would use this is by receiving data through 'get' services more often than using the 'move' service. In real-time systems, we don't usually pre-process data that much, so it made sense to focus on making get operations faster.
 
-I really enjoyed tackling this task in go. There definitely were a few issues and lessons that I came across, some more painful than others, but all Very informative. As a means to truly experience the Golang Progamming Experience I used the following resources.
+I really enjoyed tackling this task in go. There definitely were a few issues and lessons that I came across, some more painful than others, but all informative. As a means to truly experience the Golang Programming Experience I used the following resources.
 
 - [Effective Go](https://go.dev/doc/effective_go) for styling and design
 - [Go By Example](https://gobyexample.com) to learn the language
@@ -27,11 +27,11 @@ I really enjoyed tackling this task in go. There definitely were a few issues an
 Makefiles seemed a common build tool for Go Programmers, and it was something I also adopted to create a mini testing program that load's a json file and serves as a command-line API to use the functions that our interface exports.
 
 ## Disclaimer and Changes
-_I do want to quickly address any changes I made to the original code_
+_Going over changes to the original codebase_
 
-- I added loading function to `static.go`, as a means to load json data form the terminal, without modifying the pre-existing functions.
-- I changed the interface functions to return both a slice `[]Folder`, and an err `error`, as I felt all the functions did need error handling.
-- I have moved the previous `REAMDE.md` to `LEGACY_README.md`. I wanted to use this as a means of communicating my thinking process and learning strategy.
+- Added a load data function to `static.go`, to load json data from the terminal, without modifying the pre-existing functions.
+- Changed the interface functions to return both a slice `[]Folder`, and an error `error`, as I felt all the functions did need proper handling of errors.
+- Moved the previous `REAMDE.md` to `LEGACY_README.md`. I wanted to use this as a means of communicating my thinking process and learning strategy.
 
 ## Structure
 ```
@@ -47,11 +47,11 @@ _I do want to quickly address any changes I made to the original code_
     | sample.json
 ```
 
-Follows the same structure.
+The overall
 
-Although the Makefile adds the following:
-- While E2E were not implemented I did create a program, and these can be implemented using simple in and out files in the `tests` folder
-- The program is built using the `Makefile` the default `make` rule does this and runs tests as well.
+However, the Makefile introduces the following:
+- **E2E Tests:** While E2E were not implemented I did create a program, and these can be tested using simple in and out files in the `tests` folder.
+- **Building:** The program is built using the `Makefile` the default `make` rule does this and runs tests as well.
 
 ## Methods
 > I experimented with a total of three methods before coming to the conclusion. In chronological order I present my methods.
@@ -68,7 +68,7 @@ Please see `udit-tree-sol`
 
 ### The O(1) Solution
 
-The hint I got from this was maps. Obviously maps provide an amortised time-complexity, but they are simple and elegant as compared to a string prefix match. So This time around I encode the tree structure in the slice itself by ordering by the path. I then use an auxiliary data-structure, to map folderName to the index and (subtree) size of each node. Following, the get operations simply return a subarray. Which is a constant timer operation as a slice is represented by a ptr, a length, and a capacity ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)).
+The hint I got from this was maps. Obviously maps provide an amortised time-complexity, but they are simple and elegant as compared to a string prefix match. This time around I encode the tree structure in the slice itself by ordering by the path. I then use an auxiliary data-structure, to map folderName to the index and (subtree) size of each node. Following, the get operations simply return a subarray. Which is a constant timer operation as a slice is represented by a ptr, a length, and a capacity ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)).
 
 Please see `main`
 
@@ -76,7 +76,7 @@ Please see `main`
 Testing was a large part of developing this solution. I planned to test alongside developing the brute force solution, and extend this to any other solutions developed, as a means of Test Driven Development. This was the first time I had encountered Table Driven Tests, and while quite difficult to wrap my head around at first, I got well acquainted.
 
 ## My Experience
-Following learning Zig, Go seemed quite like a distant sibling. The experience was quite enjoyable. I enjoy Go's simple and easy to use declarative structure.
+Following learning Zig, Go seemed quite like a distant cousin. The experience was quite enjoyable. I enjoy Go's simple and easy to use declarative structure.
 
 I am grateful to have a reason to learn go. I would love to follow through and spend some more time learning Go. Particularly I would love to learn about using go to do following
 - Creating an HTTP Server
