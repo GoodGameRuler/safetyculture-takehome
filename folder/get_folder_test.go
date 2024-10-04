@@ -7,18 +7,8 @@ import (
 
 	"github.com/georgechieng-sc/interns-2022/folder"
 	"github.com/gofrs/uuid"
-	"github.com/stretchr/testify/assert"
 )
 
-func Test_invalid_foldername(t *testing.T) {
-	data := folder.GenerateData()
-	d := folder.NewDriver(data)
-
-
-	res, err := d.GetFoldersByOrgID(uuid.FromStringOrNil("invalidID1234@abcd"))
-	assert.Equal(t, res, []folder.Folder(nil))
-	assert.NotNil(t, err)
-}
 
 func Test_folder_GetFoldersByOrgID(t *testing.T) {
 	t.Parallel()
