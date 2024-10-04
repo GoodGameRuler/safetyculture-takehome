@@ -98,6 +98,27 @@ func MarshalJson(b interface{}) []byte {
 	return s
 }
 
+func LoadData(filePath string) ([]Folder, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("Error Loading File: %v", err)
+	}
+	defer file.Close()
+
+	jsonByte, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("Error Reading File: %v", err)
+	}
+
+	var folders []Folder
+	err = json.Unmarshal(jsonByte, &folders)
+	if err != nil {
+		return nil, fmt.Errorf("Error parsing json (likely invalid format): %v", err)
+	}
+
+	return folders, nil
+}
+
 func PrettyPrint(b interface{}) {
 	s := MarshalJson(b)
 	fmt.Print(string(s))
