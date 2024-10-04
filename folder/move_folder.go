@@ -38,6 +38,7 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 	if destFolder == nil {
 		return nil, errors.New("Error: Destination folder does not exist")
 	}
+
 	if srcFolder == nil {
 		return nil, errors.New("Error: Source folder does not exist")
 	}

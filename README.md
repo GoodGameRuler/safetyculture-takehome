@@ -1,25 +1,44 @@
-# sc-interns-2024
+# SC Take Home Assessment README
 
-The technical take home for 2024 internship applications.
+## Introduction
+This is Udit Samant's submission for the SafetyCulture Summer Internship 2024 Take Home Assessment.
 
-## Getting started
+The solution that I am submitting as the following properties
 
-Requires `Go` >= `1.23`
+**Time Complexity**
+Preprocessing: O(n^2)
 
-follow the official install instruction: [Golang Installation](https://go.dev/doc/install)
+`GetAllChildFolders`: O(1)
 
-To run the code on your local machine
+`GetFoldersByOrgID`: O(1)
 
-```
-  go run main.go
-```
+`MoveFolder`: O(n^2)
 
-## Folder structure
+**Space Complexity**
+O(n) across
 
+I argue that the main way a client would use this is by receiving data through 'get' services more often than using the 'move' service. In real-time systems, we don't usually pre-process data that much, so it made sense to focus on making get operations faster.
+
+I really enjoyed tackling this task in go. There definitely were a few issues and lessons that I came across, some more painful than others, but all informative. As a means to truly experience the Golang Programming Experience I used the following resources.
+
+- [Effective Go](https://go.dev/doc/effective_go) for styling and design
+- [Go By Example](https://gobyexample.com) to learn the language
+
+Makefiles seemed a common build tool for Go Programmers, and it was something I also adopted to create a mini testing program that loads a json file and serves as a command-line API to use the functions that our interface exports.
+
+## Disclaimer and Changes
+_Going over changes to the original codebase_
+
+- Added a load data function to `static.go`, to load json data from the terminal, without modifying the pre-existing functions.
+- Changed the interface functions to return both a slice `[]Folder`, and an error `error`, to ensure that we are handling edge cases where folder retrieval could fail properly.
+- Moved the previous `REAMDE.md` to `LEGACY_README.md`. I wanted to use this as a means of communicating my thinking process and learning strategy.
+
+## Structure
 ```
 | go.mod
 | README.md
 | main.go
+| Makefile
 | folder
     | get_folder.go
     | get_folder_test.go
@@ -28,305 +47,45 @@ To run the code on your local machine
     | sample.json
 ```
 
-## Instructions
+The overall structure remains the same.
 
-- This technical assessment consists of 2 components:
-- Component 1:
+However, the Makefile introduces the following:
+- **E2E Tests:** While E2E were not implemented I did create a program, and these can be tested using simple in and out files in the `tests` folder.
+- **Building:** The program is built using the `Makefile` the default `make` rule does this and runs tests as well.
 
-  - within `get_folder.go`.
-    - We would like you to read through, and run, the code.
-    - Implement `GetAllChildFolders` method in `get_folder.go` that returns all child folders of a given folder.
-    - Write up some unit tests in `get_folder_test.go` for all methods in `get_folder.go`.
+## Methods
+> I experimented with a total of three methods before coming to the conclusion. In chronological order I present my methods.
 
-- Component 2:
-  - within `move_folder.go`.
-    - Implement `MoveFolder` method in `move_folder.go` that moves a folder from one parent to another. (more details under component 2 section)
-    - Write up some unit tests in `move_folder_test.go` for the `MoveFolder` method.
+### Initial Brute force Solution
+I started with a brute force approach, where every time a "find" operation was needed (to locate a particular folder in the hierarchy), I would loop through all folders and perform string matching. This meant that all operations had a time complexity of O(n^2), but there was no preprocessing involved.
 
-## Path Structure
+Please see `udit-initial-sol`
 
-You are given a hierarchical tree where each node in the tree is represented by a path similar to `ltree` paths in PostgreSQL.
+### Tree Based Solution
+For my second solution, I explored a node-based tree structure, enhanced by an auxiliary data structure that mapped folder names to their corresponding folder nodes. This setup improved the efficiency of locating source and destination nodes during operations, reducing the lookup time compared to the previous method. However, the overall operations still remained O(n^2) as we still traverse all elements and perform comparisons on the file paths, which is still an O(n) operation.
 
-The tree structure is represented as a series of paths, where each path is folder name separated by dots (e.g., `"alpha.bravo.charlie"`). Each name in the path represents a node, and the full path represents that node’s position in the hierarchy.
+Please see `udit-tree-sol`
 
-we use `ltree` path for our site directory structure as well as our documents folder structure within the SC platform. This allow us to easily store and manipulate our folder structure using psql.
+### The O(1) Solution
 
-## Component 1
+The final solution came by leveraging maps to dramatically optimise the process. Maps, with their O(1) lookup time, allowed us to encode the tree structure directly into the slice by sorting folders based on their paths. We used an auxiliary map to link each folder name to its corresponding index and the size of its subtree. This approach ensures that when we execute a "get" operation, we can return a subarray in constant time—since Go slices are essentially a pointer, length, and capacity, this becomes an O(1) operation ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)). The move folder operation remains the same from the brute force approach and so remains O(n^2). A simple elegant solution.
 
-You will need to implement the following:
+Please see `main`
 
-1. A method to get all child folders of a given folder.
-2. The method should return a list of all child folders.
-3. Implement any necessary error handling (e.g. invalid orgID, invalid paths, etc).
+## Testing
+Testing was a large part of developing this solution. I planned to test alongside developing the brute force solution, and extend this to any other solutions developed, as a means of Test Driven Development. This was the first time I had encountered Table Driven Tests, and while quite difficult to wrap my head around at first, I got well acquainted. In the end Table Driven Tests made it easier to structure tests across multiple methods and branches.
 
-### Example Scenario
+Particularly, I am thankful for my tests as they uncovered an issue that was raised with prefix matching for folders: `folder` was processed as a child of `folder11` even if that wasn't the case.
 
-```go
-folders := [
-  {
-    name: "alpha",
-    path: "alpha",
-    orgID: "org1",
-  },
-  {
-    name: "bravo",
-    path: "alpha.bravo",
-    orgID: "org1",
-  },
-  {
-    name: "charlie",
-    path : "alpha.bravo.charlie",
-    orgID: "org1",
-  },
-  {
-    name: "delta",
-    path: "alpha.delta",
-    orgID: "org1",
-  },
-  {
-    name: "echo",
-    path: "echo",
-    orgID: "org1",
-  },
-  {
-    name: "foxtrot",
-    path: "foxtrot",
-    orgID: "org2",
-  },
-]
+## My Experience
+Following learning Zig, Go seemed quite like a distant cousin. The experience was quite enjoyable. I enjoyed Go's simple and easy-to-use declarative structure.
 
-getAllChildFolders("org1", "alpha")
-// Expected output
-[
-   {
-    name: "bravo",
-    path: "alpha.bravo",
-    orgID: "org1",
-  },
-  {
-    name: "charlie",
-    path : "alpha.bravo.charlie",
-    orgID: "org1",
-  },
-  {
-    name: "delta",
-    path: "alpha.delta",
-    orgID: "org1",
-  },
-]
+I am grateful to have a reason to learn go. I would love to follow through and spend some more time learning Go. Particularly I would love to learn about using Go to do following
+- Creating an HTTP Server
+- Using Channels
+- Processes and Systems Development
+- Benchmark Testing
 
-getAllChildFolders("org1", "bravo")
-// Expected output
-[
-  {
-    name: "charlie",
-    path : "alpha.bravo.charlie",
-    orgID: "org1",
-  },
-]
-
-getAllChildFolders("org1", "charlie")
-// Expected output
-[]
-
-getAllChildFolders("org1", "echo")
-// Expected output
-[]
-
-getAllChildFolders("org1", "invalid_folder")
-// Error: Folder does not exist
-
-getAllChildFolders("org1", "foxtrot")
-// Error: Folder does not exist in the specified organization
-```
-
-## Component 2
-
-You will need to implement the following:
-
-1. A method to move a subtree from one parent node to another, while maintaining the order of the children.
-2. The method should return the new folder structure once the move has occurred.
-3. Implement any necessary error handling (e.g. invalid paths, moving a node to a child of itself, moving folders to a different orgID, etc).
-4. There is no need to persist state, we can assume each method call will be independent of the previous one.
-
-### Example Scenario
-
-```go
-
-folders := [
-  {
-    name: "alpha",
-    path: "alpha",
-    orgID: "org1",
-  },
-  {
-    name: "bravo",
-    path: "alpha.bravo",
-    orgID: "org1",
-  },
-  {
-    name: "charlie",
-    path: "alpha.bravo.charlie",
-    orgID: "org1",
-  },
-  {
-    name: "delta",
-    path: "alpha.delta",
-    orgID: "org1",
-  },
-  {
-    name: "echo",
-    path: "alpha.delta.echo",
-    orgID: "org1",
-  },
-  {
-    name: "foxtrot",
-    path: "foxtrot",
-    orgID: "org2",
-  }
-  {
-    name: "golf",
-    path: "golf",
-    orgID: "org1",
-  }
-]
-
-moveFolder("bravo", "delta")
-// Expected output
-[
-  {
-    name: "alpha",
-    path: "alpha",
-    orgID: "org1",
-  },
-  {
-    name: "bravo",
-    path: "alpha.delta.bravo",
-    orgID: "org1",
-  },
-  {
-    name: "charlie",
-    path: "alpha.delta.bravo.charlie",
-    orgID: "org1",
-  },
-  {
-    name: "delta",
-    path: "alpha.delta",
-    orgID: "org1",
-  },
-  {
-    name: "echo",
-    path: "alpha.delta.echo",
-    orgID: "org1",
-  },
-  {
-    name: "foxtrot",
-    path: "foxtrot",
-    orgID: "org2",
-  }
-  {
-    name: "golf",
-    path: "golf",
-    orgID: "org1",
-  }
-]
-
-moveFolder("bravo", "golf")
-// Expected output
-[
-  {
-    name: "alpha",
-    path: "alpha",
-    orgID: "org1",
-  },
-  {
-    name: "bravo",
-    path: "golf.bravo",
-    orgID: "org1",
-  },
-  {
-    name: "charlie",
-    path: "golf.bravo.charlie",
-    orgID: "org1",
-  },
-  {
-    name: "delta",
-    path: "alpha.delta",
-    orgID: "org1",
-  },
-  {
-    name: "echo",
-    path: "alpha.delta.echo",
-    orgID: "org1",
-  },
-  {
-    name: "foxtrot",
-    pa th: "foxtrot",
-    orgID: "org2",
-  },
-  {
-    name: "golf",
-    path: "golf",
-    orgID: "org1",
-  }
-]
-
-moveFolder("bravo", "charlie")
-// Error: Cannot move a folder to a child of itself
-
-moveFolder("bravo", "bravo")
-// Error: Cannot move a folder to itself
-
-moveFolder("bravo", "foxtrot")
-// Error: Cannot move a folder to a different organization
-
-moveFolder("invalid_folder", "delta")
-// Error: Source folder does not exist
-
-moveFolder("bravo", "invalid_folder")
-// Error: Destination folder does not exist
-
-```
-
-### Sample Data
-
-a pre-populated `sample.json` file is provided for you to use as a sample data. You can use this data to test your implementation. You can also tweak the data to test different scenarios by changing the config within `static.go` and running the code.
-
-Copy and paste the code snippet below into `main.go` and running `go run main.go`.
-
-```go
-  package main
-
-  import (
-    "github.com/georgechieng-sc/interns-2022/folders"
-  )
-
-  func main() {
-    res := folders.GenerateData()
-
-    folders.PrettyPrint(res)
-
-    folders.WriteSampleData(res)
-  }
-```
-
-## FAQ
-
-- Can I use external libraries?
-  - Yes, you can use external libraries.
-- Can I use a different programming language?
-  - No, you must use Go.
-- Can I use a different testing framework?
-  - Yes, you can use a different testing framework, be prepared to explain why you chose it.
-- Can I use a different data structure?
-  - Yes, you can use a different data structure.
-- Does the folder result in component 2 need to be sorted?
-  - No, the order of the folders does not matter.
-
-## Submission
-
-Create a repo in your chosen git repository (make sure it is public so we can access it) and reply with the link to your code. We recommend using GitHub.
-
-## Contact
-
-If you have any questions feel free to contact us at: interns@safetyculture.io
+Although, I did face the following issues
+- I had some trouble navigating documentation. I found the Go by Example guide a much quicker way to navigate Go than the official documentation.
+- Testing in Go was quite different to any other library I have used, and did take some time to get accustomed to.
