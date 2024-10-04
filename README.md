@@ -68,7 +68,7 @@ Please see `udit-tree-sol`
 
 ### The O(1) Solution
 
-The final solution came by leveraging maps to dramatically optimise the process. Maps, with their O(1) lookup time, allowed us to encode the tree structure directly into the slice by sorting folders based on their paths. We used an auxiliary map to link each folder name to its corresponding index and the size of its subtree. This approach ensures that when we execute a "get" operation, we can return a subarray in constant time—since Go slices are essentially a pointer, length, and capacity, this becomes an O(1) operation ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)). The move folder operation remains the same from the brute force approach and so remains O(n^2). A simple elegant solution.
+The final solution came by leveraging maps to dramatically optimise the process. Maps, with their O(1) lookup time, allowed us to encode the tree structure directly into the slice by sorting folders based on their paths. We used an auxiliary map to link each folder name to its corresponding index and the size of its subtree. This approach ensures that when we execute a "get" operation, we can return a subarray in constant time—since Go slices are essentially a pointer, length, and capacity, this becomes an O(1) operation ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)). The move folder operation remains the same from the brute force approach and so remains O(n^2). There is also a similar pre=processing step that occurs when the data comes in. This is also O(n^2). However, the advantage of having constant time get requests irrespective of the size of the query outweighs the cost. A simple elegant solution.
 
 Please see `main`
 
