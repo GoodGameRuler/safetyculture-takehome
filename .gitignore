@@ -26,3 +26,7 @@ go.work.sum
 
 # Custom Files
 **/*.out
+**/*.in
+!/tests/*.in
+!/tests/*.out
+bin/
