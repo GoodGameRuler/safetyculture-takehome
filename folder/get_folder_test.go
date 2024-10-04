@@ -35,7 +35,7 @@ func Test_folder_GetFoldersByOrgID(t *testing.T) {
 			orgID:       uuid.FromStringOrNil("00000000-0000-0000-0000-000000000abc"),
 			folders:     []folder.Folder{},
 			want:        []folder.Folder{},
-			expectedErr: errors.New("Error: No such organisation\n"),
+			expectedErr: errors.New("Error: No such organisation"),
 		},
 		{
 			name: "single_folder_match",
@@ -53,7 +53,7 @@ func Test_folder_GetFoldersByOrgID(t *testing.T) {
 				{Name: "Folder1", OrgId: uuid.FromStringOrNil("00000000-0000-0000-0000-000000000abc"), Paths: "Folder1"},
 			},
 			want:        []folder.Folder{},
-			expectedErr: errors.New("Error: No such organisation\n"),
+			expectedErr: errors.New("Error: No such organisation"),
 		},
 		{
 			name: "multiple_folders_some_match",
@@ -90,7 +90,7 @@ func Test_folder_GetFoldersByOrgID(t *testing.T) {
 				{Name: "Folder2", OrgId: uuid.FromStringOrNil("00000000-0000-0000-0000-000000000def"), Paths: "Folder2"},
 			},
 			want:        []folder.Folder{},
-			expectedErr: errors.New("Error: No such organisation\n"),
+			expectedErr: errors.New("Error: No such organisation"),
 		},
 		// Sneaky Match Test Case
 		{
