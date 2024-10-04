@@ -6,7 +6,7 @@ This is Udit Samant's submission for the SafetyCulture Summer Internship 2024 Ta
 The solution that I am submitting as the following properties
 
 **Time Complexity**
-Preprocessing: O(n^2)
+Preprocessing: O(n^2 * logn)
 
 `GetAllChildFolders`: O(1)
 
