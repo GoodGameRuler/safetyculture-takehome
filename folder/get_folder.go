@@ -1,7 +1,8 @@
 package folder
 
 import (
-	"fmt"
+	"errors"
+	_ "fmt"
 	s "strings"
 
 	"github.com/gofrs/uuid"
@@ -11,7 +12,7 @@ func GetAllFolders() []Folder {
 	return GetSampleData()
 }
 
-func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) []Folder {
+func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) ([]Folder, error) {
 	folders := f.folders
 
 	res := []Folder{}
@@ -21,11 +22,11 @@ func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) []Folder {
 		}
 	}
 
-	return res
+	return res, nil
 
 }
 
-func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) []Folder {
+func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) ([]Folder, error){
 	var subTree *Folder = nil
 
 	for _, folder := range f.folders {
@@ -36,13 +37,12 @@ func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) []Folder {
 	}
 
 	if subTree == nil {
-		fmt.Print("Error: Folder does not exist")
-		return nil
+
+		return nil, errors.New("Error: Folder does not exist")
 	}
 
 	if subTree.OrgId != orgID {
-		fmt.Print("Error: Folder does not exist in the specified organization\n")
-		return nil;
+		return nil, errors.New("Error: Folder does not exist in the specified organization\n")
 	}
 
 	var returnList = make([]Folder, 0);
@@ -53,5 +53,5 @@ func (f *driver) GetAllChildFolders(orgID uuid.UUID, name string) []Folder {
 		}
 	}
 
-	return returnList
+	return returnList, nil
 }
