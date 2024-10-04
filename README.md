@@ -57,31 +57,32 @@ However, the Makefile introduces the following:
 > I experimented with a total of three methods before coming to the conclusion. In chronological order I present my methods.
 
 ### Initial Brute force Solution
-I started with brute force approach. Every time a "find" operation (locating a particular folder in the hierarchy) was need I would loop through all folders and do string matching. This meant that all operations took O(n^2) time, but there was no pre-processing.
+I started with a brute force approach, where every time a "find" operation was needed (to locate a particular folder in the hierarchy), I would loop through all folders and perform string matching. This meant that all operations had a time complexity of O(n²), but there was no preprocessing involved.
 
 Please see `udit-initial-sol`
 
 ### Tree Based Solution
-A second solution I explored was a node based Tree structure, with an auxiliary data-structured that mapped a folder name to folder node. This meant that some time was saved in finding the source and destination nodes during operations, but operations were still O(n^2) as the collection process ran through all elments with comparisons on the file path which is an O(n) operation.
+For my second solution, I explored a node-based tree structure, enhanced by an auxiliary data structure that mapped folder names to their corresponding folder nodes. This setup improved the efficiency of locating source and destination nodes during operations, reducing the lookup time compared to the previous method. However, the overall operations still remained O(n^2) as we still traverse all elements and perform comparisons on the file paths, which is still an O(n) operation.
 
 Please see `udit-tree-sol`
 
 ### The O(1) Solution
 
-The hint I got from this was maps. Obviously maps provide an amortised time-complexity, but they are simple and elegant as compared to a string prefix match. This time around I encode the tree structure in the slice itself by ordering by the path. I then use an auxiliary data-structure, to map folderName to the index and (subtree) size of each node. Following, the get operations simply return a subarray. Which is a constant timer operation as a slice is represented by a ptr, a length, and a capacity ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)).
+The final solution came by leveraging maps to dramatically optimise the process. Maps, with their O(1) lookup time, allowed us to encode the tree structure directly into the slice by sorting folders based on their paths. We used an auxiliary map to link each folder name to its corresponding index and the size of its subtree. This approach ensures that when we execute a "get" operation, we can return a subarray in constant time—since Go slices are essentially a pointer, length, and capacity, this becomes an O(1) operation ([Slice Expression](https://go.dev/ref/spec#Slice_expressions)). The move folder operation remains the same from the brute force approach and so remains O(n^2). A simple elegant solution.
 
 Please see `main`
 
 ## Testing
-Testing was a large part of developing this solution. I planned to test alongside developing the brute force solution, and extend this to any other solutions developed, as a means of Test Driven Development. This was the first time I had encountered Table Driven Tests, and while quite difficult to wrap my head around at first, I got well acquainted.
+Testing was a large part of developing this solution. I planned to test alongside developing the brute force solution, and extend this to any other solutions developed, as a means of Test Driven Development. This was the first time I had encountered Table Driven Tests, and while quite difficult to wrap my head around at first, I got well acquainted. Table Driven Tests made it easier to structure tests across multiple cases, ensuring that the logic held up regardless of how the input varied.
 
 ## My Experience
 Following learning Zig, Go seemed quite like a distant cousin. The experience was quite enjoyable. I enjoy Go's simple and easy to use declarative structure.
 
-I am grateful to have a reason to learn go. I would love to follow through and spend some more time learning Go. Particularly I would love to learn about using go to do following
+I am grateful to have a reason to learn go. I would love to follow through and spend some more time learning Go. Particularly I would love to learn about using Go to do following
 - Creating an HTTP Server
 - Using Channels
 - Processes and Systems Development
+- Benchmark Testing
 
 Although, I did face the following issues
 - I had some trouble navigating documentation. I found the Go by Example guide a much quicker way to navigate Go than the documentation at first.
