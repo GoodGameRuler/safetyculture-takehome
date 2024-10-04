@@ -1,12 +1,18 @@
 package folder
 
-import "github.com/gofrs/uuid"
+import (
+	"errors"
+	_ "fmt"
+	s "strings"
+
+	"github.com/gofrs/uuid"
+)
 
 func GetAllFolders() []Folder {
 	return GetSampleData()
 }
 
-func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) []Folder {
+func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) ([]Folder, error) {
 	folders := f.folders
 
 	res := []Folder{}
@@ -16,7 +22,7 @@ func (f *driver) GetFoldersByOrgID(orgID uuid.UUID) []Folder {
 		}
 	}
 
-	return res
+	return res, nil
 
 }
 
