@@ -59,8 +59,8 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 		}
 	}
 
-	// Build the new base path for the source
 	newBasePath := destFolder.Paths
+	srcPath := srcFolder.Paths
 
 	if commonLength >= len(srcParts) {
 		panic("This should never be the case\n")
@@ -72,8 +72,8 @@ func (f *driver) MoveFolder(name string, dst string) ([]Folder, error) {
 		if folder.Name == srcFolder.Name {
 			folders[i].Paths = newBasePath
 
-		} else if s.HasPrefix(folder.Paths, srcFolder.Paths + ".") {
-			folders[i].Paths = s.Replace(folder.Paths, srcFolder.Paths + ".", newBasePath + ".", 1)
+		} else if s.HasPrefix(folder.Paths, srcFolder.Paths+".") {
+			folders[i].Paths = s.Replace(folder.Paths, srcPath+".", newBasePath + ".", 1)
 		}
 	}
 
